@@ -1,0 +1,17 @@
+.userList{
+    border-radius: 14px;
+}
+
+.userLink{
+    text-decoration: none;
+    color: inherit;
+    font-size: 15px;
+    display: block;
+    transition: all 0.2s ease;
+}
+
+.userLink:hover{
+    color: #1976d2;
+    transform: translateX(5px);
+    background-color: #f5f7fa;
+}
