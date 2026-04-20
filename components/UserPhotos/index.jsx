@@ -1,29 +1,47 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
 
 import { Typography } from '@mui/material';
 
 import './styles.css';
 import { Link, useParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import api from '../../lib/api';
+
 
 function UserPhotos() {
   const {userId} = useParams();
-  const [photos,setPhotos] = useState([]);
+  // const [photos,setPhotos] = useState([]);
   
-  useEffect(() => {
-    async function getPhotos() {
-      try{
-      const response = await api.get(`/photosOfUser/${userId}`);
-      setPhotos(response.data);
+  // useEffect(() => {
+  //   async function getPhotos() {
+  //     try{
+  //     const response = await api.get(`/photosOfUser/${userId}`);
+  //     setPhotos(response.data);
       
-      } catch (error){
-        console.error(error);
-      }
-    }
+  //     } catch (error){
+  //       console.error(error);
+  //     }
+  //   }
 
-    getPhotos();
-  },[userId]);
+  //   getPhotos();
+  // },[userId]);
+
+  const {data: photos = []} = useQuery({
+    queryKey: ['photos', userId],
+    queryFn: async () => {
+      try {
+        const res = await api.get(`/photosOfUser/${userId}`);
+        return res.data;
+      } catch(error){
+        console.error(error);
+        return [];
+      }
+    },
+    enabled: !!userId
+  });
+
+
 
 
   const formated = (d) => {
