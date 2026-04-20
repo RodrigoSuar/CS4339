@@ -13,7 +13,7 @@ import api from '../../lib/api';
     const {userId} = useParams();
     
     const {data: user} = useQuery({
-      queryKey: ['user',userId],
+      queryKey: ['userName',userId],
       queryFn: async () => {
         const res = await api.get(`/user/${userId}`);
         const first = res.data.first_name;
