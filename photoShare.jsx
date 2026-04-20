@@ -11,6 +11,7 @@ import TopBar from './components/TopBar';
 import UserDetail from './components/UserDetail';
 import UserList from './components/UserList';
 import UserPhotos from './components/UserPhotos';
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query"
 
 function Home() {
   return (
@@ -74,6 +75,7 @@ function UserLayout() {
   return <Outlet />;
 }
 
+const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
   {
