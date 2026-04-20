@@ -1,36 +1,66 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { Typography } from '@mui/material';
 
 import './styles.css';
 import { Link, useParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import api from '../../lib/api';
+
 
 function UserDetail() {
   const {userId} = useParams();
-  const [user,setUser] = useState(
-    {
+  // const [user,setUser] = useState(
+  //   {
+  //     _id: '',
+  //     first_name: '',
+  //     last_name: '',
+  //     location: '',
+  //     description: "",
+  //     occupation: ''
+  //   }
+  // );
+  
+  // useEffect(() => {
+  //   async function getUser() {
+  //     try{
+  //       const response = await api.get(`/user/${userId}`);
+  //       setUser(response.data);
+  //       //console.log(response.data)
+  //     } catch (error){
+  //       console.error(error);
+  //     }
+  //   }
+  //   getUser();
+  // },[userId]);
+
+  const {data : user = {
       _id: '',
       first_name: '',
       last_name: '',
       location: '',
       description: "",
-      occupation: ''
-    }
-  );
-  
-  useEffect(() => {
-    async function getUser() {
+      occupation: '',
+  }} = useQuery({
+    queryKey: ['user',userId],
+    queryFn: async () => {
       try{
-        const response = await api.get(`/user/${userId}`);
-        setUser(response.data);
-        //console.log(response.data)
+        const res = await api.get(`/user/${userId}`);
+        return res.data;
       } catch (error){
-        console.error(error);
+        console.log(error);
+        return {
+          _id: '',
+        first_name: '',
+        last_name: '',
+        location: '',
+        description: "",
+        occupation: '',
+        };
       }
-    }
-    getUser();
-  },[userId]);
+    },
+    enabled: !!userId
+  });
 
   return (
     <div className="user-detail-container">
