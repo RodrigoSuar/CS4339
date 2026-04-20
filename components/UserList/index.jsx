@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
   Divider,
   List,
@@ -7,32 +7,46 @@ import {
   Typography,
 } from '@mui/material';
 import { Link } from "react-router-dom";
+import { useQuery } from '@tanstack/react-query';
+
 import api from '../../lib/api';
 import './styles.css';
 
 
-
 function UserList() {
-  const [users,setUsers] = useState([]);
+  
 
-  useEffect(() => {
-    async function getUsers(){
-      try{
-        const response = await api.get("/user/list");
+  // useEffect(() => {
+  //   async function getUsers(){
+  //     try{
+  //       const response = await api.get("/user/list");
       
-        setUsers(response.data);
-        //console.log(response.data)
-      } catch(error){
+  //       setUsers(response.data);
+  //       //console.log(response.data)
+  //     } catch(error){
+  //       console.error(error);
+  //     }
+  //   }
+
+  //   getUsers();
+  
+  // },[]);
+
+  const {data : users = []} = useQuery({
+    queryKey : ['users'],
+    queryFn: async () => {
+      try {
+        const res = await api.get("/user/list");
+        
+        return res.data;
+      } catch (error){
         console.error(error);
+        return [];
       }
     }
+  });
 
-    getUsers();
   
-  },[]);
-
-  //const response = await api.get("/users");
-  //console.log(response)
   return (
     
       <Typography variant="body1" component="div">
@@ -56,3 +70,11 @@ function UserList() {
 }
 
 export default UserList;
+
+
+
+
+
+
+
+
