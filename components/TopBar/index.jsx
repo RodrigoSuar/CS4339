@@ -1,10 +1,10 @@
+
 import React  from 'react';
 import { AppBar, Toolbar, Typography } from '@mui/material';
 import './styles.css';
 import { useLocation, useParams } from 'react-router-dom';
 import {useQuery} from '@tanstack/react-query';
 import api from '../../lib/api';
-
 
 
 
@@ -51,3 +51,4 @@ import api from '../../lib/api';
   }
 
 export default TopBar;
+
