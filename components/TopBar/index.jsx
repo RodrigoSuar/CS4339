@@ -2,7 +2,7 @@ import React  from 'react';
 import { AppBar, Toolbar, Typography } from '@mui/material';
 import './styles.css';
 import { useLocation, useParams } from 'react-router-dom';
-import useQuery from '@tanstack/react-query';
+import {useQuery} from '@tanstack/react-query';
 import api from '../../lib/api';
 
 
@@ -16,7 +16,9 @@ import api from '../../lib/api';
       queryKey: ['user',userId],
       queryFn: async () => {
         const res = await api.get(`/user/${userId}`);
-        return res.data;
+        const first = res.data.first_name;
+        const last = res.data.last_name;
+        return `${first} ${last}`;
       },
       enabled: !!userId
     });
