@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
 
-import { Typography } from '@mui/material';
+import { Typography, TextField, Button } from '@mui/material';
 
 import './styles.css';
 import { Link, useParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../lib/api';
 
 
@@ -65,6 +65,7 @@ function UserPhotos() {
             <img src={`../../images/${photo.file_name}`}/>
             
             <Comments comments={photo.comments} formated={formated}/>
+            <AddComment photoId={photo._id} userId={userId} />
             
             
             
@@ -113,5 +114,38 @@ function Comments  ({comments,formated}) {
 }
 
 
+
+function AddComment({ photoId, userId }) {
+  const [text, setText] = useState('');
+  const queryClient = useQueryClient();
+
+  const commentMutation = useMutation({
+    mutationFn: async (comment) => {
+      const res = await api.post(`/commentsOfPhoto/${photoId}`, { comment });
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['photos', userId]);
+      setText('');
+    },
+  });
+
+  return (
+    <div style={{ marginTop: '0.5rem' }}>
+      <Typography variant="body2">Add a comment</Typography>
+      <TextField
+        size="small"
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+      />
+      <Button onClick={() => commentMutation.mutate(text)} style={{ marginLeft: '0.5rem' }}>
+        Post
+      </Button>
+      {commentMutation.isError && (
+        <Typography color="error">{commentMutation.error.response?.data || 'Failed to post comment'}</Typography>
+      )}
+    </div>
+  );
+}
 
 export default UserPhotos;

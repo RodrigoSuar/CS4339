@@ -11,6 +11,8 @@ import api from '../../lib/api';
   function TopBar({ currentUser, setCurrentUser }) {
     const location = useLocation();
     const {userId} = useParams();
+    const match = location.pathname.match(/\/users\/([^/]+)/);
+    const resolvedUserId = userId || (match && match[1]);
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
@@ -24,14 +26,14 @@ import api from '../../lib/api';
     });
     
     const {data: user} = useQuery({
-      queryKey: ['userName',userId],
+      queryKey: ['userName', resolvedUserId],
       queryFn: async () => {
-        const res = await api.get(`/user/${userId}`);
+        const res = await api.get(`/user/${resolvedUserId}`);
         const first = res.data.first_name;
         const last = res.data.last_name;
         return `${first} ${last}`;
       },
-      enabled: !!userId
+      enabled: !!resolvedUserId
     });
 
     let content = "";
@@ -39,10 +41,9 @@ import api from '../../lib/api';
     
       
       if(location.pathname.includes('photos')){
-        content = (`${user} photo's`);
+        content = user ? `${user} photo's` : '';
       }else if(location.pathname.includes('users')){
-        
-        content = (`Details for ${user}`);
+        content = user ? `Details for ${user}` : '';
       }else {
         //console.log('i am in the home page');
       }
@@ -50,8 +51,8 @@ import api from '../../lib/api';
     return (
       <AppBar className="topbar-appBar" position="absolute">
         <Toolbar className='toolbar'>
-          <Typography variant="h5" color="inherit">
-            Rodrigo Suarez
+          <Typography variant="h5" color="inherit" style={{ marginRight: '1rem' }}>
+            Rodrigo Suarez - Connor Treybig
           </Typography>
           <Typography variant="h5" color="inherit">
             {content}
