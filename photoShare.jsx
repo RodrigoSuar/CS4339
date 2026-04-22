@@ -1,18 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import ReactDOM from 'react-dom/client';
 import { Grid, Typography, Paper } from '@mui/material';
 import {
-  createBrowserRouter, RouterProvider, Outlet, useParams,
+  createBrowserRouter, RouterProvider, Outlet, useParams, Navigate,
 } from 'react-router-dom';
 
-import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import './styles/main.css';
 import TopBar from './components/TopBar';
 import UserDetail from './components/UserDetail';
 import UserList from './components/UserList';
 import UserPhotos from './components/UserPhotos';
-
+import LoginRegister from './components/LoginRegister';
 
 function Home() {
   return (
@@ -49,12 +49,14 @@ function UserPhotosRoute() {
   return <UserPhotos userId={userId} />;
 }
 
-function Root() {
+function Root({ currentUser, setCurrentUser }) {
+  if (!currentUser) return <Navigate to="/login-register" replace />;
+
   return (
     <div>
       <Grid container spacing={2}>
         <Grid item xs={12}>
-          <TopBar />
+          <TopBar currentUser={currentUser} setCurrentUser={setCurrentUser} />
         </Grid>
         <div className="main-topbar-buffer" />
         <Grid item sm={3}>
@@ -78,30 +80,38 @@ function UserLayout() {
 
 const queryClient = new QueryClient();
 
-const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <Root />,
-    children: [
-      { index: true, element: <Home /> },
+function App() {
+  const [currentUser, setCurrentUser] = useState(null);
 
-      { path: 'users', element: <UserList /> },
+  const router = createBrowserRouter([
+    {
+      path: '/login-register',
+      element: <LoginRegister onLogin={(user) => setCurrentUser(user)} />,
+    },
+    {
+      path: '/',
+      element: <Root currentUser={currentUser} setCurrentUser={setCurrentUser} />,
+      children: [
+        { index: true, element: <Home /> },
+        { path: 'users', element: <UserList /> },
+        {
+          path: 'users/:userId',
+          element: <UserLayout />,
+          children: [
+            { index: true, element: <UserDetailRoute /> },
+            { path: 'photos', element: <UserPhotosRoute /> },
+          ],
+        },
+      ],
+    },
+  ]);
 
-      {
-        path: 'users/:userId',
-        element: <UserLayout />,
-        children: [
-          { index: true, element: <UserDetailRoute /> },
-          { path: 'photos', element: <UserPhotosRoute /> },
-        ],
-      },
-    ],
-  },
-]);
+  return <RouterProvider router={router} />;
+}
 
 const root = ReactDOM.createRoot(document.getElementById('photoshareapp'));
 root.render(
   <QueryClientProvider client={queryClient}>
-    <RouterProvider router={router} />
+    <App />
   </QueryClientProvider>
 );
