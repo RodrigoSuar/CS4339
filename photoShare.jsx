@@ -6,7 +6,8 @@ import {
   createBrowserRouter, RouterProvider, Outlet, useParams, Navigate,
 } from 'react-router-dom';
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
+import api from './lib/api';
 import './styles/main.css';
 import TopBar from './components/TopBar';
 import UserDetail from './components/UserDetail';
@@ -49,7 +50,8 @@ function UserPhotosRoute() {
   return <UserPhotos userId={userId} />;
 }
 
-function Root({ currentUser, setCurrentUser }) {
+function Root({ currentUser, setCurrentUser, authChecked }) {
+  if (!authChecked) return null;
   if (!currentUser) return <Navigate to="/login-register" replace />;
 
   return (
@@ -82,6 +84,22 @@ const queryClient = new QueryClient();
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
+  const [authChecked, setAuthChecked] = useState(false);
+
+  useQuery({
+    queryKey: ['me'],
+    queryFn: async () => {
+      try {
+        const res = await api.get('/admin/me');
+        setCurrentUser(res.data);
+      } catch {
+        // no session
+      } finally {
+        setAuthChecked(true);
+      }
+      return null;
+    },
+  });
 
   const router = createBrowserRouter([
     {
@@ -90,7 +108,7 @@ function App() {
     },
     {
       path: '/',
-      element: <Root currentUser={currentUser} setCurrentUser={setCurrentUser} />,
+      element: <Root currentUser={currentUser} setCurrentUser={setCurrentUser} authChecked={authChecked}/>,
       children: [
         { index: true, element: <Home /> },
         { path: 'users', element: <UserList /> },
