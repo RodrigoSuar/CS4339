@@ -108,6 +108,17 @@ app.post('/user', async (req, res) => {
  * GET /user/list
  * Returns the list of users.
  */
+app.get('/admin/me', requireAuth, async (req, res) => {
+  try {
+    const user = await User.findById(req.session.userId).lean();
+    if (!user) return res.status(404).send('User not found');
+    const { password_digest, __v, ...safeUser } = user;
+    return res.json(safeUser);
+  } catch (err) {
+    return res.status(500).send(err.message);
+  }
+});
+
 app.get('/user/list', requireAuth, async (req, res) => {
   try {
     // TODO:
