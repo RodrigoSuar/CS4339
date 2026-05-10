@@ -1,3 +1,4 @@
+import 'dotenv/config.js';
 import express from 'express';
 import cors from 'cors';
 import session from 'express-session';
@@ -14,7 +15,7 @@ const app = express();
 
 // define these in env and import in this file
 const port = process.env.PORT || 3001;
-const mongoUrl = process.env.MONGO_URL || 'mongodb://127.0.0.1/project3';
+const mongoUrl = process.env.MONGODB_URI;
 
 // Enable CORS for frontend running on a different port
 app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
@@ -202,22 +203,22 @@ app.get('/photosOfUser/:id', requireAuth, async (req, res) => {
 
      for (const photo of photos) {
       for (const comment of photo.comments) {
-        const user = await User.findById(comment.user_id).lean()
+        const user = await User.findById(comment.user_id).lean();
 
-        delete user.location
-        delete user.description
-        delete user.occupation
-        delete user.__v
+        delete user.location;
+        delete user.description;
+        delete user.occupation;
+        delete user.__v;
 
         comment.user = user;
         delete comment.user_id;
       }
-      delete photo.__v
+      delete photo.__v;
     }
 
 
     if (photos.length === 0) {
-      return res.status(404).send('photos not found')
+      return res.status(404).send('photos not found');
     }
     return res.json(photos);
   } catch (err) {
