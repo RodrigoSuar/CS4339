@@ -1,4 +1,3 @@
-import 'dotenv/config.js';
 /**
  * Loads the Project 4 demo data into MongoDB using Mongoose.
  * Run: node loadDatabase.js
@@ -21,6 +20,7 @@ import models from "./modelData/photoApp.js";
 import User from "./schema/user.js";
 import Photo from "./schema/photo.js";
 import SchemaInfo from "./schema/schemaInfo.js";
+import 'dotenv/config.js';
 
 /** Bcrypt digest for seeded accounts; bcrypt.compare("weak", ...) is true. */
 const SEEDED_PASSWORD_DIGEST =
@@ -45,7 +45,7 @@ const cloudinaryUrls = {
 mongoose.Promise = bluebird;
 mongoose.set("strictQuery", false);
 const mongoUri =
-  process.env.MONGODB_URI || process.env.MONGO_URL || "mongodb://127.0.0.1/project4";
+  process.env.MONGODB_URI;
 mongoose.connect(mongoUri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
