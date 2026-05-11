@@ -70,7 +70,7 @@ app.post('/admin/login', async (req, res) => {
 
 /* POST /admin/logout
 */
-
+ 
 app.post('/admin/logout', (req, res) => {
   if (!req.session.userId) {  return res.status(400).send('Not logged in'); }
 
@@ -248,4 +248,27 @@ app.post('/commentsOfPhoto/:photoId', requireAuth, async (req, res) => {
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
+});
+
+
+app.post('/photos', requireAuth, async (req, res) => {
+  const { url } = req.body;
+
+  // Validate input
+  if (!url || !url.trim()) {
+    return res.status(400).send('URL is required');
+  }
+
+  try {
+    const photo = await Photo.create({
+      file_name: url.trim(),              
+      user_id: req.session.userId,        
+      date_time: new Date(),              
+      comments: []
+    });
+
+    return res.status(201).json(photo);
+  } catch (err) {
+    return res.status(500).send(err.message);
+  }
 });
