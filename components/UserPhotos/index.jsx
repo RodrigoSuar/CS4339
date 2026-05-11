@@ -62,7 +62,7 @@ function UserPhotos() {
             
             {`Photo created on: ${formated(photo.date_time)}`}
             </div>
-            <img src={`../../images/${photo.file_name}`}/>
+            <img src={photo.file_name}/>
             
             <Comments comments={photo.comments} formated={formated}/>
             <AddComment photoId={photo._id} userId={userId} />
