@@ -1,0 +1,17 @@
+.like-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 18px;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  transition: transform 0.1s ease;
+  transform: scale(1);
+  
+}
+
+.like-button.pending {
+  cursor: not-allowed;
+  transform: scale(0.95);
+}

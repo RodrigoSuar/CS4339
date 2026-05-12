@@ -7,25 +7,19 @@ import './styles.css';
 import { Link, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../lib/api';
-
+import LikeButton from '../LikeButton';
 
 function UserPhotos() {
   const {userId} = useParams();
-  // const [photos,setPhotos] = useState([]);
   
-  // useEffect(() => {
-  //   async function getPhotos() {
-  //     try{
-  //     const response = await api.get(`/photosOfUser/${userId}`);
-  //     setPhotos(response.data);
-      
-  //     } catch (error){
-  //       console.error(error);
-  //     }
-  //   }
-
-  //   getPhotos();
-  // },[userId]);
+  // Fetch current user data
+  const { data: currentUser } = useQuery({
+    queryKey: ['me'],
+    queryFn: async () => {
+      const res = await api.get('/admin/me');
+      return res.data;
+    },
+  });
 
   const {data: photos = []} = useQuery({
     queryKey: ['photos', userId],
@@ -64,6 +58,11 @@ function UserPhotos() {
             </div>
             <img src={photo.file_name}/>
             
+            <LikeButton 
+              photoId={photo._id}
+              currentUserId={currentUser?._id}
+              photoLikes={photo.likes || []}
+            />
             <Comments comments={photo.comments} formated={formated}/>
             <AddComment photoId={photo._id} userId={userId} />
             
@@ -125,7 +124,7 @@ function AddComment({ photoId, userId }) {
       return res.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['photos', userId]);
+      queryClient.invalidateQueries({ queryKey: ['photos', userId] });
       setText('');
     },
   });

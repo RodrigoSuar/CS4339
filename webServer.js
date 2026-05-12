@@ -272,3 +272,45 @@ app.post('/photos', requireAuth, async (req, res) => {
     return res.status(500).send(err.message);
   }
 });
+
+app.post('/photos/:photoId/like', requireAuth, async (req, res) => {
+  const { photoId } = req.params;
+  const userId = req.session.userId;
+
+  if (!isValidObjectId(photoId)) {
+    return res.status(400).send('Invalid photo id');
+  }
+
+  try {
+    const photo = await Photo.findById(photoId);
+
+    if (!photo) {
+      return res.status(404).send('Photo not found');
+    }
+
+    // Ensure likes array exists
+    if (!photo.likes) {
+      photo.likes = [];
+    }
+
+    const userObjectId = userId.toString();
+
+    const index = photo.likes
+      .map(id => id.toString())
+      .indexOf(userObjectId);
+
+    if (index === -1) {
+      // Like photo
+      photo.likes.push(userId);
+    } else {
+      // Unlike photo
+      photo.likes.splice(index, 1);
+    }
+
+    await photo.save();
+
+    return res.json(photo);
+  } catch (err) {
+    return res.status(500).send(err.message);
+  }
+});
