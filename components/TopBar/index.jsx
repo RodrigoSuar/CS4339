@@ -55,7 +55,7 @@ function TopBar({ currentUser, setCurrentUser }) {
             {content}
           </Typography>
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            {currentUser && location.pathname.includes('photos') && (
+            {currentUser && (
               <Button color="inherit" onClick={() => setUploadModalOpen(true)}>
                 Add Photo
               </Button>
