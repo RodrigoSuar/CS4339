@@ -37,8 +37,6 @@ function PhotoUploadModal({ open, onClose, userId }) {
         formData.append('file', file);
         formData.append('upload_preset', uploadPreset);
 
-        console.log(uploadPreset);
-
         const cloudinaryResponse = await fetch(
             `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
             {
@@ -62,8 +60,8 @@ function PhotoUploadModal({ open, onClose, userId }) {
         return backendResponse.data;
         },
         onSuccess: () => {
-        // Invalidate photos query to refresh the feed
-        queryClient.invalidateQueries({ queryKey: ['photos', userId] });
+        // Invalidate all photo queries so any open feed refreshes
+        queryClient.invalidateQueries({ queryKey: ['photos'] });
         // Reset form
         setSelectedFile(null);
         setFileError('');
