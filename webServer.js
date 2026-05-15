@@ -173,10 +173,12 @@ app.get('/user/:id', requireAuth, async (req, res) => {
 
     const user = await User.findById(userId).lean();
 
-    if(!user){
+    if (!user) {
       return res.status(404).send('user not found');
     }
     delete user.__v;
+    delete user.login_name;
+    delete user.password_digest;
     return res.json(user);
   } catch (err) {
     return res.status(500).send(err.message);
@@ -224,6 +226,8 @@ app.get('/photosOfUser/:id', requireAuth, async (req, res) => {
         delete user.description;
         delete user.occupation;
         delete user.__v;
+        delete user.login_name;
+        delete user.password_digest;
 
         comment.user = user;
         delete comment.user_id;
