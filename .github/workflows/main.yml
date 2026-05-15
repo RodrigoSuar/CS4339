@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, feature/docker-deploy]
+    branches: [main]
   pull_request:
     branches: [main]
 
@@ -15,8 +15,10 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm ci
-      - run: npm run lint
+      - name: Install backend and frontend deps
+        run: npm install
+      - name: Lint
+        run: npm run lint
 
   test:
     runs-on: ubuntu-latest
@@ -36,17 +38,18 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm ci
+      - name: Install backend and frontend deps
+        run: npm install
       - name: Install test deps
         working-directory: test
-        run: npm ci || npm install
+        run: npm install
       - name: Seed database
         run: node loadDatabase.js
       - name: Start server
         run: node webServer.js &
       - name: Wait for server
         run: npx --yes wait-on http://127.0.0.1:3001/healthz --timeout 30000
-      - name: Run integration tests
+      - name: Run tests
         working-directory: test
         run: npm test
 

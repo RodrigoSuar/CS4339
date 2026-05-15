@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "mocha serverApiTest.js --timeout 20000"
+    "test": "mocha serverApiTest.js newRoutesTest.js --timeout 20000"
   },
   "devDependencies": {
     "async": "^3.2.6",
