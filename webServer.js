@@ -233,7 +233,6 @@ app.get('/photosOfUser/:id', requireAuth, async (req, res) => {
         delete comment.user_id;
       }));
       delete photo.__v;
-      delete photo.likes;
     }));
 
 
