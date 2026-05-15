@@ -13,7 +13,7 @@ import {
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../lib/api';
 
-function PhotoUploadModal({ open, onClose, userId }) {
+function PhotoUploadModal({ open, onClose }) {
     const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
     const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
         

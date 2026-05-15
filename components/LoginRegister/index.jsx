@@ -8,8 +8,13 @@ function LoginRegister({ onLogin }) {
   const navigate = useNavigate();
   const [loginForm, setLoginForm] = useState({ login_name: '', password: '' });
   const [registerForm, setRegisterForm] = useState({
-    login_name: '', password: '', first_name: '', last_name: '',
-    location: '', description: '', occupation: '',
+    login_name: '',
+password: '',
+first_name: '',
+last_name: '',
+    location: '',
+description: '',
+occupation: '',
   });
 
   const loginMutation = useMutation({
