@@ -48,6 +48,8 @@ mongoose.connection.once('open', () => {
   console.log('Connected to MongoDB');
 });
 
+app.get('/healthz', (req, res) => res.sendStatus(200));
+
 function isValidObjectId(id) {
   return mongoose.Types.ObjectId.isValid(id);
 }
@@ -85,9 +87,9 @@ app.post('/admin/login', async (req, res) => {
 */
  
 app.post('/admin/logout', (req, res) => {
-  if (!req.session.userId) {  return res.status(400).send('Not logged in'); }
+  if (!req.session.userId) { return res.status(400).send('Not logged in'); }
 
-  req.session.destroy((err) => {
+  return req.session.destroy((err) => {
     if (err) return res.status(500).send(err.message);
     return res.sendStatus(200);
   });
@@ -138,13 +140,13 @@ app.get('/user/list', requireAuth, async (req, res) => {
     // TODO:
     // 1. Fetch all users from MongoDB.
     // 2. Return only the fields required by the frontend.
-    const users = await User.find({}).lean()
+    const users = await User.find({}).lean();
 
     const userList = users.map(user => ({
       _id: user._id,
       first_name: user.first_name,
       last_name: user.last_name 
-    }))
+    }));
 
     return res.json(userList);
   } catch (err) {
@@ -171,10 +173,12 @@ app.get('/user/:id', requireAuth, async (req, res) => {
 
     const user = await User.findById(userId).lean();
 
-    if(!user){
-      return res.status(404).send('user not found')
+    if (!user) {
+      return res.status(404).send('user not found');
     }
-    delete user.__v
+    delete user.__v;
+    delete user.login_name;
+    delete user.password_digest;
     return res.json(user);
   } catch (err) {
     return res.status(500).send(err.message);
@@ -204,30 +208,32 @@ app.get('/photosOfUser/:id', requireAuth, async (req, res) => {
     // 6. Return the resulting array.
 
 
-    let p = await Photo.find({}).lean()
+    let p = await Photo.find({}).lean();
 
 
 
     //console.log(p)
 
-    let photos = p.filter((photo) => photo.user_id.toString() === userId)
+    let photos = p.filter((photo) => photo.user_id.toString() === userId);
 
     
 
-     for (const photo of photos) {
-      for (const comment of photo.comments) {
+    await Promise.all(photos.map(async (photo) => {
+      await Promise.all(photo.comments.map(async (comment) => {
         const user = await User.findById(comment.user_id).lean();
 
         delete user.location;
         delete user.description;
         delete user.occupation;
         delete user.__v;
+        delete user.login_name;
+        delete user.password_digest;
 
         comment.user = user;
         delete comment.user_id;
-      }
+      }));
       delete photo.__v;
-    }
+    }));
 
 
     if (photos.length === 0) {
