@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches: [main, feature/docker-deploy]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+
+  test:
+    runs-on: ubuntu-latest
+    needs: lint
+    services:
+      mongo:
+        image: mongo:7
+        ports:
+          - 27017:27017
+    env:
+      MONGODB_URI: mongodb://127.0.0.1:27017/project3
+      SESSION_SECRET: ci-secret
+      PORT: 3001
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Install test deps
+        working-directory: test
+        run: npm ci || npm install
+      - name: Seed database
+        run: node loadDatabase.js
+      - name: Start server
+        run: node webServer.js &
+      - name: Wait for server
+        run: npx --yes wait-on http://127.0.0.1:3001/healthz --timeout 30000
+      - name: Run integration tests
+        working-directory: test
+        run: npm test
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Trigger Render deploy
+        env:
+          HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "RENDER_DEPLOY_HOOK secret not set; skipping deploy."
+            exit 0
+          fi
+          curl -fsSL -X POST "$HOOK"

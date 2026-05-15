@@ -1,0 +1,14 @@
+{
+  "name": "project3-tests",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "mocha serverApiTest.js --timeout 20000"
+  },
+  "devDependencies": {
+    "async": "^3.2.6",
+    "lodash": "^4.17.21",
+    "mocha": "^10.7.3"
+  }
+}

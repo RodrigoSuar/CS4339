@@ -48,6 +48,8 @@ mongoose.connection.once('open', () => {
   console.log('Connected to MongoDB');
 });
 
+app.get('/healthz', (req, res) => res.sendStatus(200));
+
 function isValidObjectId(id) {
   return mongoose.Types.ObjectId.isValid(id);
 }
