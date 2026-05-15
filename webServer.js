@@ -2,6 +2,7 @@ import 'dotenv/config.js';
 import express from 'express';
 import cors from 'cors';
 import session from 'express-session';
+import MongoStore from 'connect-mongo';
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 
@@ -17,13 +18,25 @@ const app = express();
 const port = process.env.PORT || 3001;
 const mongoUrl = process.env.MONGODB_URI;
 
-// Enable CORS for frontend running on a different port
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+const isProd = process.env.NODE_ENV === 'production';
+const allowedOrigins = (process.env.CLIENT_ORIGIN || 'http://localhost:3000')
+  .split(',')
+  .map((o) => o.trim());
+
+if (isProd) app.set('trust proxy', 1);
+
+app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json());
 app.use(session({
   secret: process.env.SESSION_SECRET || 'p3-secret',
   resave: false,
   saveUninitialized: false,
+  store: MongoStore.create({ mongoUrl: mongoUrl }),
+  cookie: {
+    sameSite: isProd ? 'none' : 'lax',
+    secure: isProd,
+    maxAge: 1000 * 60 * 60 * 24 * 7,
+  },
 }));
 
 // Connect to MongoDB
