@@ -1,4 +1,4 @@
-# Project 3: Authentication, Server State, and Mutations
+# Project 4: Deployment, DevOps, and Production Integration
 
 ## Prerequisites
 - Node.js LTS (>= 18), npm (>= 9)
@@ -67,3 +67,8 @@ npm run lint
 - MVC-style split (routes/controllers/models), thin `webServer.js`
 - Central frontend API module (e.g. `api.js`)
 - ESLint clean; remove or disable React Query Devtools before submit
+
+
+## Deployed 
+- Frontend URL:https://cs-4339.vercel.app/login-register
+- Backend URL:https://project-4-13i9.onrender.com/
